@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+	<html lang="en">
+	
+	<head>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+		<meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+		<title>Document</title>
+		<style>
+			body,
+			html {
+				margin: 0;
+				padding: 0;
+				width: 100%;
+				height: 100%;
+			}
+			.content{
+				/* display: flex;
+				flex-flow: column;
+				justify-content: center;
+				align-items: center; */
+				width: 50%;
+				margin: 0 auto;
+				position: relative;
+				min-height: calc(100% - 80px);
+			}
+			#heading{
+				text-align: center;
+				font-size: 40px;
+				font-weight: bold;
+				padding: 40px 0;
+			}
+			.api{
+				color: #409EFF;
+				font-weight: bolder;
+			}
+			.foot{
+				border-top: 1px;
+				height: 80px;
+				line-height: 80px;
+				text-align: center;
+				background: #eee;
+				color: #333;
+				font-size: 16px;
+				width: 100%;
+			}
+			.codebg{
+				background: #2e2e1f;
+				color: #fff;
+				border-radius: 10px;
+				padding: 10px;
+			}
+			@media screen and (max-width: 500px) {
+				.content{
+					width: 100%;
+					padding: 0 20px;
+				}
+			}
+		</style>
+	</head>
+	
+	<body>
+		<div class="content">
+		<p><a id="gotoindex" href="javascript:;" onclick="gotoIndex()">返回首页</a></p>
+<h1 id="heading">图书模块接口文档</h1>
+<p><strong>目录</strong>：</p>
+<ul>
+<li><a href="#获取图书信息"><b>获取图书信息 -- GET /apidoc/book</b></a></li>
+</ul>
+<h2 id="a-name-hrefa"><a name="获取图书信息" href="#获取图书信息">获取图书信息</a></h2>
+<p><code>GET /apidoc/book</code></p>
+<p>Request header:</p>
+<ul>
+<li>Content-Type: application/json; charset=utf-8</li>
+</ul>
+<p>Response header:</p>
+<ul>
+<li>Content-Type: application/json; charset=utf-8</li>
+</ul>
+<p>Param - Query</p>
+<ul>
+<li>id (<em>uint</em>)</li>
+</ul>
+<p>Return</p>
+<ul>
+<li>code (<em>int</em>)</li>
+<li>msg (<em>string</em>)</li>
+<li>Book (<em>object</em>)</li>
+</ul>
+<p>Error</p>
+<ul>
+<li>{&quot;code&quot;:1,&quot;msg&quot;:&quot;认证失败&quot;}</li>
+<li>{&quot;code&quot;:2,&quot;msg&quot;:&quot;校验失败&quot;}</li>
+</ul>
+<p>Example:</p>
+<details>
+<summary>Param</summary>
+<pre><code class="language-json">id=1
+</code></pre>
+</details>
+<details>
+<summary>Return</summary>
+<pre><code class="language-json">{
+    &quot;code&quot;: 0,
+    &quot;msg&quot;: &quot;&quot;,
+    &quot;Book&quot;: {
+        &quot;id&quot;: 1,
+        &quot;string&quot;: &quot;jd&quot;,
+        &quot;page&quot;: 100
+    }
+}
+</code></pre>
+</details>
+</div>
+    <!-- raw HTML omitted -->
+    <footer class="foot">
+		Copyright © 2022, jdlau. All rights reserved. 
+    </footer>
+</body>
+<script text="javascript">
+	function getIndexPath() {
+		return '/apidoc/index'
+	}
+	function directPath(path) {
+		window.location.href = window.location.pathname.replace(getIndexPath(), path)
+	}
+	function gotoIndex() {
+		window.location.href = getIndexPath()
+	}
+	function isIndex() {
+		return window.location.pathname === getIndexPath()
+	}
+	function showGotoIndex() {
+		if(isIndex()) {
+			document.getElementById('gotoindex').hidden = true
+		}
+	}
+
+	showGotoIndex()
+</script>
+</html>
+	
