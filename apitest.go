@@ -30,7 +30,7 @@ import (
 	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
-	"github.com/donnol/tools/worker"
+	"github.com/donnol/do"
 )
 
 // Predefined error
@@ -253,7 +253,7 @@ func (at *AT) MonkeyRun() *AT {
 
 // PressureRun 压力运行，n: 运行次数，c: 并发数
 func (at *AT) PressureRun(n, c int) *AT {
-	w := worker.New(c)
+	w := do.NewWorker(c)
 	w.Start()
 
 	// 记录开始时间
@@ -261,7 +261,7 @@ func (at *AT) PressureRun(n, c int) *AT {
 
 	var total int64
 	for i := 0; i < n; i++ {
-		if err := w.Push(*worker.NewJob(func(ctx context.Context) error {
+		if err := w.Push(*do.NewJob(func(ctx context.Context) error {
 			// 运行
 			at.run(true)
 

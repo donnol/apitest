@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/donnol/tools/apitest/testtype"
+	"github.com/donnol/apitest/testtype"
 )
 
 var (

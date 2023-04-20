@@ -5,12 +5,12 @@ import (
 	"bytes"
 	"fmt"
 	"io/fs"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
 	"text/template"
 
-	"github.com/donnol/tools/log"
 	"github.com/gin-gonic/gin"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"
@@ -134,7 +134,7 @@ type Link struct {
 
 // GinHandlerAPIDoc 针对指定目录下的md接口文档，生成对应的html文件，并注册到gin路由上
 func GinHandlerAPIDoc(doc *gin.RouterGroup, dir string, brand string) {
-	log.Infof("[apidoc] apidoc dir: %s", dir)
+	log.Printf("[apidoc] apidoc dir: %s", dir)
 
 	// 遍历目录
 	var links []Link
@@ -184,7 +184,7 @@ func GinHandlerAPIDoc(doc *gin.RouterGroup, dir string, brand string) {
 		)
 		var buf bytes.Buffer
 		if err := md.Convert(mddata, &buf); err != nil {
-			log.Errorf("[apidoc] convert md file to html failed: %v, file: %s", err, fi.Name())
+			log.Printf("[apidoc] convert md file to html failed: %v, file: %s", err, fi.Name())
 			return err
 		}
 		htmlFileName := fileName + ".html"
@@ -201,7 +201,7 @@ func GinHandlerAPIDoc(doc *gin.RouterGroup, dir string, brand string) {
 		})
 		return nil
 	}); err != nil {
-		log.Errorf("[apidoc] walk doc dir %s failed: %v", dir, err)
+		log.Printf("[apidoc] walk doc dir %s failed: %v", dir, err)
 		return
 	}
 
@@ -211,19 +211,19 @@ func GinHandlerAPIDoc(doc *gin.RouterGroup, dir string, brand string) {
 	indexFilePath := filepath.Join(dir, indexFileName)
 	temp, err := template.New(indexRoute).Parse(indexTmpl)
 	if err != nil {
-		log.Errorf("[apidoc] parse index template failed: %v", err)
+		log.Printf("[apidoc] parse index template failed: %v", err)
 		return
 	}
 	indexBuf := new(bytes.Buffer)
 	if err := temp.ExecuteTemplate(indexBuf, indexRoute, map[string]interface{}{
 		"list": links,
 	}); err != nil {
-		log.Errorf("[apidoc] exec index template failed: %v", err)
+		log.Printf("[apidoc] exec index template failed: %v", err)
 		return
 	}
 	content := fillContent(indexBuf.Bytes(), brand, doc.BasePath())
 	if err := os.WriteFile(indexFilePath, content, os.ModePerm); err != nil {
-		log.Errorf("[apidoc] write file failed: %v", err)
+		log.Printf("[apidoc] write file failed: %v", err)
 		return
 	}
 	doc.StaticFile("/"+indexRoute, indexFilePath)

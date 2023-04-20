@@ -9,23 +9,22 @@ import (
 
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/donnol/apitest/testtype"
-	"github.com/donnol/tools/reflectx"
 )
 
 var (
-	testStruct = reflectx.User{
-		Model: &reflectx.Model{
-			InnerModel: reflectx.InnerModel{
+	testStruct = testtype.UserModel{
+		Model: &testtype.Model{
+			InnerModel: testtype.InnerModel{
 				CornerStone: "jd",
 			},
 		},
-		Basic: reflectx.Basic{
+		Basic: testtype.Basic{
 			Name: "jd",
 		},
 		Age: 18,
-		AddressList: []reflectx.Address{
+		AddressList: []testtype.Address{
 			{
-				Basic: reflectx.Basic{
+				Basic: testtype.Basic{
 					Name: "tianhe",
 				},
 				Position: "guangdong tianhe",
@@ -89,7 +88,7 @@ func TestStructRandomValue(t *testing.T) {
 }
 
 func TestCompositeStructValue(t *testing.T) {
-	v := compositeStructValue(reflect.TypeOf(reflectx.Model{}))
+	v := compositeStructValue(reflect.TypeOf(testtype.Model{}))
 	_ = v
 	// t.Logf("v: %+v\n", v)
 	// JSONIndent(os.Stdout, v.Interface())
@@ -155,7 +154,7 @@ func TestCollectStructField(t *testing.T) {
 }
 
 func TestFakeStruct(t *testing.T) {
-	var user reflectx.User
+	var user testtype.UserModel
 	if err := gofakeit.Struct(&user); err != nil {
 		t.Fatal(err)
 	}

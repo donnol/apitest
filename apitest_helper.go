@@ -19,7 +19,7 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/donnol/tools/reflectx"
+	"github.com/donnol/do"
 	"github.com/go-xmlfmt/xmlfmt"
 )
 
@@ -737,7 +737,7 @@ func structToList(name string, data ...any) (string, error) {
 func structToBlock(name, method string, data any) (string, map[string]string, error) {
 	var block string
 
-	dataStruct, err := reflectx.ResolveStruct(data)
+	dataStruct, err := do.ResolveStruct(data)
 	if err != nil {
 		return block, nil, err
 	}
@@ -783,7 +783,7 @@ func getFieldNameByTag(tag reflect.StructTag) string {
 	return tag.Get("json")
 }
 
-func fieldsToLine(level int, fields []reflectx.Field) (string, map[string]string) {
+func fieldsToLine(level int, fields []do.Field) (string, map[string]string) {
 	var lines string
 	var keyCommentMap = make(map[string]string)
 	for _, field := range fields {
