@@ -14,6 +14,8 @@ package apitest
 import (
 	"bytes"
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"encoding/json"
 	"encoding/xml"
 	"errors"
@@ -42,10 +44,14 @@ var (
 // AT api test
 type AT struct {
 	// 服务器配置
-	scheme string
-	host   string
-	port   string
-	url    url.URL
+	scheme             string
+	host               string
+	port               string
+	url                url.URL
+	caCertPath         string
+	certFile           string
+	keyFile            string
+	insecureSkipVerify bool
 
 	// 请求相关
 	authHeaderKey   string
@@ -118,6 +124,18 @@ func (at *AT) New() *AT {
 // SetScheme 设置scheme
 func (at *AT) SetScheme(scheme string) *AT {
 	at.scheme = scheme
+	return at
+}
+
+func (at *AT) SetCert(caCertPath, certFile, keyFile string) *AT {
+	at.caCertPath = caCertPath
+	at.certFile = certFile
+	at.keyFile = keyFile
+	return at
+}
+
+func (at *AT) InsecureSkipVerify() *AT {
+	at.insecureSkipVerify = true
 	return at
 }
 
@@ -668,6 +686,35 @@ func (at *AT) run(realDo bool) *AT {
 	}
 	at.req = req
 
+	var tlsConfig *tls.Config
+	if at.scheme == "https" {
+		if at.insecureSkipVerify {
+			tlsConfig = &tls.Config{
+				InsecureSkipVerify: at.insecureSkipVerify,
+			}
+		} else {
+			caCrt, err := os.ReadFile(at.caCertPath)
+			if err != nil {
+				at.setErr(err)
+				return at
+			}
+
+			pool := x509.NewCertPool()
+			pool.AppendCertsFromPEM(caCrt)
+
+			cliCrt, err := tls.LoadX509KeyPair(at.certFile, at.keyFile)
+			if err != nil {
+				at.setErr(err)
+				return at
+			}
+
+			tlsConfig = &tls.Config{
+				RootCAs:      pool,
+				Certificates: []tls.Certificate{cliCrt},
+			}
+		}
+	}
+
 	// 发起请求
 	// https://medium.com/@nate510/don-t-use-go-s-default-http-client-4804cb19f779
 	transport := &http.Transport{
@@ -677,6 +724,7 @@ func (at *AT) run(realDo bool) *AT {
 		TLSHandshakeTimeout: 5 * time.Second,
 		MaxIdleConns:        100, // 最大空闲连接数
 		MaxIdleConnsPerHost: 100, // 每个域名最大空闲连接数
+		TLSClientConfig:     tlsConfig,
 	}
 	client := &http.Client{
 		Timeout:   time.Second * 10, // 超时
