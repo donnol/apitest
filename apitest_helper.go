@@ -826,7 +826,7 @@ func fieldsToLine(level int, fields []do.Field) (string, map[string]string) {
 		}
 		if fieldTypeName == "" {
 			switch fieldType.Kind() {
-			case reflect.Struct:
+			case reflect.Struct, reflect.Interface:
 				fieldTypeName = "object"
 			case reflect.Slice:
 				sliceType := fieldType.Elem()
@@ -858,7 +858,7 @@ func fieldsToLine(level int, fields []do.Field) (string, map[string]string) {
 
 		// 结构体，切片等复合结构，需要继续遍历，并且在写入时向内缩进
 		switch fieldType.Kind() {
-		case reflect.Struct, reflect.Slice:
+		case reflect.Struct, reflect.Slice, reflect.Interface:
 			newLevel := level
 			if !isEmbed { // 如果是内嵌结构体，不需要向内缩进
 				newLevel = level + 1
