@@ -64,6 +64,7 @@ type AT struct {
 	param           any
 	paramFormat     string // 结果格式，默认为`json`
 	file            string // 文件
+	resultWrapper   ResultWrapper
 	result          any
 	resultFormat    string // 结果格式，默认为`json`
 	ates            []any
@@ -90,6 +91,10 @@ type AT struct {
 	isPressureBatch bool
 
 	err error
+}
+
+type ResultWrapper interface {
+	WithData(data any)
 }
 
 // NewAT 新建
@@ -387,10 +392,22 @@ func extract(format string, data []byte, r any) error {
 	return nil
 }
 
+// ResultWrapper 指定结果包装结构
+func (at *AT) ResultWrapper(rw ResultWrapper) *AT {
+	if rw == nil {
+		at.setErr(fmt.Errorf("result wrapper r can't be nil"))
+		return at
+	}
+
+	at.resultWrapper = rw
+
+	return at
+}
+
 // Result 获取结果
 func (at *AT) Result(r any) *AT {
 	if r == nil {
-		at.setErr(fmt.Errorf("param r can't be nil"))
+		at.setErr(fmt.Errorf("result r can't be nil"))
 		return at
 	}
 
@@ -408,7 +425,14 @@ func (at *AT) Result(r any) *AT {
 			return at
 		}
 	}
-	at.result = r
+
+	// 当有resultWrapper时，使用它来包装结果
+	if at.resultWrapper != nil {
+		at.resultWrapper.WithData(r)
+		at.result = at.resultWrapper
+	} else {
+		at.result = r
+	}
 
 	at.jsonIndent(os.Stdout, r)
 
