@@ -833,11 +833,21 @@ func fieldsToLine(level int, fields []do.Field) (string, map[string]string) {
 				if sliceType.Kind() == reflect.Struct {
 					fieldTypeName = "object"
 				} else {
-					fieldTypeName = sliceType.String()
+					ft := replaceTypeName(sliceType)
+					if ft != "" {
+						fieldTypeName = ft
+					} else {
+						fieldTypeName = sliceType.String()
+					}
 				}
 				fieldTypeName += " list"
 			default:
-				fieldTypeName = fieldType.Kind().String()
+				ft := replaceTypeName(fieldType)
+				if ft != "" {
+					fieldTypeName = ft
+				} else {
+					fieldTypeName = fieldType.Kind().String()
+				}
 			}
 		}
 
@@ -876,6 +886,14 @@ func fieldsToLine(level int, fields []do.Field) (string, map[string]string) {
 	}
 
 	return lines, keyCommentMap
+}
+
+func replaceTypeName(ft reflect.Type) (r string) {
+	if ft.PkgPath() == "github.com/donnol/do" &&
+		ft.Name() == "Id" {
+		r = "string"
+	}
+	return
 }
 
 func linePrefix(level int) string {
