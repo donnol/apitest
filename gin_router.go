@@ -46,6 +46,14 @@ const (
 				position: relative;
 				min-height: calc(100% - 80px);
 			}
+			#gotoindex{
+				position: fixed;
+				top: 0;
+				right: 25%;
+				text-align: center;
+				font-weight: bold;
+				padding: 40px 0;
+			}
 			#heading{
 				text-align: center;
 				font-size: 40px;
