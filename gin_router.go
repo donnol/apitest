@@ -126,6 +126,7 @@ const (
 
 	indexTmpl = `<div class="content">
     <p id="heading">接口文档</p>
+	<h3>请先阅读<a href="javascript:;" onclick="directPath('/apidoc/README')">接口文档说明</a>，谢谢^^。</h3>
     <ul>
     {{range $k, $v := .list}}
         <li><p><a href="javascript:;" onclick="directPath('{{$v.Url}}')">{{$v.Title}}</a></p></li>

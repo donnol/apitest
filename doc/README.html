@@ -71,19 +71,13 @@
 	<body>
 		<div class="content">
 		<p><a id="gotoindex" href="javascript:;" onclick="gotoIndex()">返回首页</a></p>
-<div class="content">
-    <p id="heading">接口文档</p>
-	<h3>请先阅读<a href="javascript:;" onclick="directPath('/apidoc/README')">接口文档说明</a>，谢谢^^。</h3>
-    <ul>
-    
-        <li><p><a href="javascript:;" onclick="directPath('/apidoc/README')">接口文档说明</a></p></li>
-    
-        <li><p><a href="javascript:;" onclick="directPath('/apidoc/book')">图书模块接口文档</a></p></li>
-    
-        <li><p><a href="javascript:;" onclick="directPath('/apidoc/user')">用户模块接口文档</a></p></li>
-    
-    </ul>
-</div>
+<h1 id="heading">接口文档说明</h1>
+<h2 id="heading-1">认证</h2>
+<p>先调用<code>login</code>接口，获得<code>token</code>。</p>
+<p>在后续接口调用时在<code>header</code>上添加：<code>Authorization</code>: <code>Bearer [token]</code>.</p>
+<p>如：</p>
+<pre><code class="language-sh">Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDM5OTQwODksImlkIjoiNDkxNTgyMDczOTM3NjI2Nzc1Iiwib2lkIjoiMSIsInRhZyI6InVuaWZpZWRfbG9naW4iLCJ0aWQiOiIxMDAxIn0.8oMA2WJ3bQmWOVcGofaGBIg3vwWOyQtpJc6Dh2he3ao
+</code></pre>
 </div>
     <!-- raw HTML omitted -->
     <footer class="foot">
