@@ -86,6 +86,13 @@ const (
 					padding: 0 20px;
 				}
 			}
+			pre {
+				white-space: pre-wrap;       /* Since CSS 2.1 */
+				white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+				white-space: -pre-wrap;      /* Opera 4-6 */
+				white-space: -o-pre-wrap;    /* Opera 7 */
+				word-wrap: break-word;       /* Internet Explorer 5.5+ */
+			}
 		</style>
 	</head>
 	
@@ -117,6 +124,38 @@ const (
 		if(isIndex()) {
 			document.getElementById('gotoindex').hidden = true
 		}
+	}
+
+	function sendRequest(method, path, tokenId, paramId, id) {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+				document.getElementById(id).innerHTML = JSON.stringify(JSON.parse(xhr.response), null, "\t");
+            }
+        }
+		var token = document.getElementById(tokenId).value;
+		var paramValue = document.getElementById(paramId).value;
+		var body;
+		if(paramValue != '') {
+			if(method == 'get' || method == 'delete') {
+				path += '?'+paramValue;
+			}else{
+				body = paramValue;
+			}
+		}
+        xhr.open(method, path, true);
+        xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+		xhr.setRequestHeader('Authorization', 'Bearer '+ token);
+		console.log(body);
+        xhr.send(body);
+    }
+	function formatParams( params ){
+		return "?" + Object
+			.keys(params)
+			.map(function(key){
+				return key+"="+encodeURIComponent(params[key])
+			})
+			.join("&")
 	}
 
 	showGotoIndex()

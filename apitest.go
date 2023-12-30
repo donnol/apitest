@@ -29,6 +29,7 @@ import (
 	"reflect"
 	"strings"
 	"sync/atomic"
+	"text/template"
 	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
@@ -798,6 +799,33 @@ func (at *AT) commentWithStatus() string {
 	return commentWithStatus
 }
 
+var (
+	exampleTmpl = `
+<div>
+	{{range $k,$v := .Inputs}}<div>
+		<label for="{{$v.Name}}">{{$v.Name}}</label>
+		<p></p>
+		<textarea rows="4" cols="50" name="{{$v.Name}}" id="{{$v.Id}}"></textarea></div>
+	{{end}}<div>
+	<button onclick="sendRequest('{{.Method}}', '{{.Path}}', '{{.Token}}', '{{.Params}}', '{{.ResultDivId}}')">Try to run</button>
+	<pre id="{{.ResultDivId}}" style="font-size: large"></pre></div>
+</div>
+`
+)
+
+type Example struct {
+	Inputs      []Input
+	Method      string
+	Path        string
+	Token       string
+	Params      string
+	ResultDivId string
+}
+type Input struct {
+	Name string
+	Id   string
+}
+
 // 生成文档
 func (at *AT) makeDoc() *AT {
 
@@ -883,6 +911,27 @@ func (at *AT) makeDoc() *AT {
 		}
 		doc += block
 	}
+
+	paramId := "param" + at.path
+	tokenId := "token" + at.path
+	resultDivId := "result" + at.path
+	var inputs []Input
+	if len(pkcm) > 0 {
+		inputs = append(inputs, Input{Name: "Params(参照下面的示例)", Id: paramId})
+	}
+	if !strings.Contains(at.path, "login") {
+		inputs = append(inputs, Input{Name: "Token(从登录接口返回)", Id: tokenId})
+	}
+	buf := new(bytes.Buffer)
+	do.Must1(template.New(resultDivId).Parse(exampleTmpl)).Execute(buf, Example{
+		Inputs:      inputs,
+		Method:      strings.ToLower(at.method),
+		Path:        at.path,
+		Token:       tokenId,
+		Params:      paramId,
+		ResultDivId: resultDivId,
+	})
+	doc += buf.String() + "\n\n"
 
 	doc += exampleName + ":\n\n"
 
