@@ -133,8 +133,16 @@ const (
 				document.getElementById(id).innerHTML = JSON.stringify(JSON.parse(xhr.response), null, "\t");
             }
         }
-		var token = document.getElementById(tokenId).value;
-		var paramValue = document.getElementById(paramId).value;
+		var tokenEle = document.getElementById(tokenId);
+		var token = '';
+		if(tokenEle != null) {
+			token = tokenEle.value;
+		}
+		var paramEle = document.getElementById(paramId);
+		var paramValue = ''
+		if(paramEle != null) {
+			paramValue = paramEle.value;
+		}
 		var body;
 		if(paramValue != '') {
 			if(method == 'get' || method == 'delete') {
@@ -146,7 +154,6 @@ const (
         xhr.open(method, path, true);
         xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
 		xhr.setRequestHeader('Authorization', 'Bearer '+ token);
-		console.log(body);
         xhr.send(body);
     }
 	function formatParams( params ){

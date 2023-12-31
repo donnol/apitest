@@ -803,7 +803,7 @@ var (
 	exampleTmpl = `
 <div>
 	{{range $k,$v := .Inputs}}<div>
-		<label for="{{$v.Name}}">{{$v.Name}}</label>
+		<label for="{{$v.Name}}"><a href="{{$v.Login}}">{{$v.Name}}</a></label>
 		<p></p>
 		<textarea rows="4" cols="50" name="{{$v.Name}}" id="{{$v.Id}}"></textarea></div>
 	{{end}}<div>
@@ -822,8 +822,9 @@ type Example struct {
 	ResultDivId string
 }
 type Input struct {
-	Name string
-	Id   string
+	Name  string
+	Login string
+	Id    string
 }
 
 // 生成文档
@@ -912,15 +913,15 @@ func (at *AT) makeDoc() *AT {
 		doc += block
 	}
 
-	paramId := "param" + at.path
-	tokenId := "token" + at.path
-	resultDivId := "result" + at.path
+	paramId := "param" + at.path + " " + at.method
+	tokenId := "token" + at.path + " " + at.method
+	resultDivId := "result" + at.path + " " + at.method
 	var inputs []Input
 	if len(pkcm) > 0 {
 		inputs = append(inputs, Input{Name: "Params(参照下面的示例)", Id: paramId})
 	}
 	if !strings.Contains(at.path, "login") {
-		inputs = append(inputs, Input{Name: "Token(从登录接口返回)", Id: tokenId})
+		inputs = append(inputs, Input{Name: "Token(从登录接口返回)", Login: "/apidoc/README", Id: tokenId})
 	}
 	buf := new(bytes.Buffer)
 	do.Must1(template.New(resultDivId).Parse(exampleTmpl)).Execute(buf, Example{
