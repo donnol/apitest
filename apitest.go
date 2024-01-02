@@ -852,9 +852,13 @@ func (at *AT) makeDoc() *AT {
 
 	// req header
 	h := "Request header:\n"
+	auth := false
 	for k, v := range at.req.Header {
 		if k != "Content-Type" && k != at.authHeaderKey {
 			continue
+		}
+		if k == at.authHeaderKey {
+			auth = true
 		}
 		v1 := ""
 		if len(v) > 0 {
@@ -864,6 +868,9 @@ func (at *AT) makeDoc() *AT {
 			v1 = at.authHeaderValue
 		}
 		h += fmt.Sprintf("- %s: %s\n", k, v1)
+	}
+	if !auth {
+		h += fmt.Sprintf("- %s: %s\n", at.authHeaderKey, at.authHeaderValue)
 	}
 	doc += h + "\n"
 
@@ -926,7 +933,7 @@ func (at *AT) makeDoc() *AT {
 		inputs = append(inputs, Input{Name: "Params(参照下面的示例)", Id: paramId})
 	}
 	if at.authHeaderKey != "" {
-		inputs = append(inputs, Input{Name: "Token(从登录接口返回)", Login: "/apidoc/README", Id: tokenId})
+		inputs = append(inputs, Input{Name: "Token(从登录接口返回 - " + http.CanonicalHeaderKey(at.authHeaderKey) + ": " + at.authHeaderValue + ")", Login: "/apidoc/README", Id: tokenId})
 	}
 	buf := new(bytes.Buffer)
 	do.Must1(template.New(resultDivId).Parse(exampleTmpl)).Execute(buf, Example{
