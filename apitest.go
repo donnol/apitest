@@ -920,7 +920,7 @@ func (at *AT) makeDoc() *AT {
 	if len(pkcm) > 0 {
 		inputs = append(inputs, Input{Name: "Params(参照下面的示例)", Id: paramId})
 	}
-	if !strings.Contains(at.path, "login") {
+	if at.authHeaderKey != "" {
 		inputs = append(inputs, Input{Name: "Token(从登录接口返回)", Login: "/apidoc/README", Id: tokenId})
 	}
 	buf := new(bytes.Buffer)
