@@ -801,15 +801,20 @@ func (at *AT) commentWithStatus() string {
 
 var (
 	exampleTmpl = `
+<details>
+<summary>Try to run</summary>
 <div>
-	{{range $k,$v := .Inputs}}<div>
-		<label for="{{$v.Name}}"><a href="{{$v.Login}}">{{$v.Name}}</a></label>
-		<p></p>
-		<textarea rows="4" cols="50" name="{{$v.Name}}" id="{{$v.Id}}"></textarea></div>
-	{{end}}<div>
-	<button onclick="sendRequest('{{.Method}}', '{{.Path}}', '{{.Token}}', '{{.Params}}', '{{.ResultDivId}}')">Try to run</button>
-	<pre id="{{.ResultDivId}}" style="font-size: large"></pre></div>
+{{range $k,$v := .Inputs}}<div>
+<label for="{{$v.Name}}"><a href="{{$v.Login}}">{{$v.Name}}</a></label>
+<p></p>
+<textarea rows="4" cols="50" name="{{$v.Name}}" id="{{$v.Id}}"></textarea>
 </div>
+{{end}}<div>
+<button onclick="sendRequest('{{.Method}}', '{{.Path}}', '{{.Token}}', '{{.Params}}', '{{.ResultDivId}}')">Try to run</button>
+<pre id="{{.ResultDivId}}" style="font-size: large"></pre>
+</div>
+</div>
+</details>
 `
 )
 
