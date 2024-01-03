@@ -807,7 +807,7 @@ var (
 {{range $k,$v := .Inputs}}<div>
 <label for="{{$v.Name}}"><a href="{{$v.Login}}">{{$v.Name}}</a></label>
 <p></p>
-<textarea rows="4" cols="50" name="{{$v.Name}}" id="{{$v.Id}}" placeholder='{{$v.Placeholder}}'></textarea>
+<textarea rows="4" cols="50" name="{{$v.Name}}" id="{{$v.Id}}" placeholder='{{$v.Placeholder}}'>{{$v.Placeholder}}</textarea>
 </div>
 {{end}}<div>
 <button onclick="sendRequest('{{.Method}}', '{{.Path}}', '{{.Token}}', '{{.Params}}', '{{.ResultDivId}}')">Try to run</button>
