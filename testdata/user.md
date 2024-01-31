@@ -14,6 +14,7 @@
 
 Request header:
 - Content-Type: application/json; charset=utf-8
+- : 
 
 Response header:
 - Content-Type: application/json; charset=utf-8
@@ -37,6 +38,23 @@ Return
     * city (*string*) 城市
     * home (*string*) 家
 * phone (*string*) 手机
+
+
+<details>
+<summary>Try to run</summary>
+<div>
+<div>
+<label for="Params(参照下面的示例)"><a href="">Params(参照下面的示例)</a></label>
+<p></p>
+<textarea rows="4" cols="50" name="Params(参照下面的示例)" id="param/api/user GET" placeholder='addr=%7B+%7D&age=0&id=1&name=jd&phone='>addr=%7B+%7D&age=0&id=1&name=jd&phone=</textarea>
+</div>
+<div>
+<button onclick="sendRequest('get', '/api/user', 'token/api/user GET', 'param/api/user GET', 'result/api/user GET')">Try to run</button>
+<pre id="result/api/user GET" style="font-size: large"></pre>
+</div>
+</div>
+</details>
+
 
 Example:
 
@@ -73,6 +91,7 @@ addr=%7B+%7D&age=0&id=1&name=jd&phone=
 
 Request header:
 - Content-Type: application/json; charset=utf-8
+- : 
 
 Response header:
 - Content-Type: application/json; charset=utf-8
@@ -96,6 +115,23 @@ Return
     * city (*string*) 城市
     * home (*string*) 家
 * phone (*string*) 手机
+
+
+<details>
+<summary>Try to run</summary>
+<div>
+<div>
+<label for="Params(参照下面的示例)"><a href="">Params(参照下面的示例)</a></label>
+<p></p>
+<textarea rows="4" cols="50" name="Params(参照下面的示例)" id="param/api/user POST" placeholder='{"id":"1","name":"jd","age":0,"addr":{"city":"","home":""},"phone":""}'>{"id":"1","name":"jd","age":0,"addr":{"city":"","home":""},"phone":""}</textarea>
+</div>
+<div>
+<button onclick="sendRequest('post', '/api/user', 'token/api/user POST', 'param/api/user POST', 'result/api/user POST')">Try to run</button>
+<pre id="result/api/user POST" style="font-size: large"></pre>
+</div>
+</div>
+</details>
+
 
 Example:
 
@@ -141,6 +177,7 @@ Example:
 
 Request header:
 - Content-Type: text/csv; charset=utf-8
+- : 
 
 Response header:
 - Content-Type: application/json; charset=utf-8
@@ -164,6 +201,23 @@ Return
     * city (*string*) 城市
     * home (*string*) 家
 * phone (*string*) 手机
+
+
+<details>
+<summary>Try to run</summary>
+<div>
+<div>
+<label for="Params(参照下面的示例)"><a href="">Params(参照下面的示例)</a></label>
+<p></p>
+<textarea rows="4" cols="50" name="Params(参照下面的示例)" id="param/api/user/import POST" placeholder='{"id":"1","name":"jd","age":0,"addr":{"city":"","home":""},"phone":""}'>{"id":"1","name":"jd","age":0,"addr":{"city":"","home":""},"phone":""}</textarea>
+</div>
+<div>
+<button onclick="sendRequest('post', '/api/user/import', 'token/api/user/import POST', 'param/api/user/import POST', 'result/api/user/import POST')">Try to run</button>
+<pre id="result/api/user/import POST" style="font-size: large"></pre>
+</div>
+</div>
+</details>
+
 
 Example:
 

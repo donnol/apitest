@@ -65,6 +65,13 @@
 					padding: 0 20px;
 				}
 			}
+			pre {
+				white-space: pre-wrap;       /* Since CSS 2.1 */
+				white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+				white-space: -pre-wrap;      /* Opera 4-6 */
+				white-space: -o-pre-wrap;    /* Opera 7 */
+				word-wrap: break-word;       /* Internet Explorer 5.5+ */
+			}
 		</style>
 	</head>
 	
@@ -81,6 +88,7 @@
 <p>Request header:</p>
 <ul>
 <li>Content-Type: application/json; charset=utf-8</li>
+<li>:</li>
 </ul>
 <p>Response header:</p>
 <ul>
@@ -101,6 +109,20 @@
 <li>{&quot;code&quot;:1,&quot;msg&quot;:&quot;认证失败&quot;}</li>
 <li>{&quot;code&quot;:2,&quot;msg&quot;:&quot;校验失败&quot;}</li>
 </ul>
+<details>
+<summary>Try to run</summary>
+<div>
+<div>
+<label for="Params(参照下面的示例)"><a href="">Params(参照下面的示例)</a></label>
+<p></p>
+<textarea rows="4" cols="50" name="Params(参照下面的示例)" id="param/apidoc/book GET" placeholder='id=1'>id=1</textarea>
+</div>
+<div>
+<button onclick="sendRequest('get', '/apidoc/book', 'token/apidoc/book GET', 'param/apidoc/book GET', 'result/apidoc/book GET')">Try to run</button>
+<pre id="result/apidoc/book GET" style="font-size: large"></pre>
+</div>
+</div>
+</details>
 <p>Example:</p>
 <details>
 <summary>Param</summary>
@@ -143,6 +165,45 @@
 		if(isIndex()) {
 			document.getElementById('gotoindex').hidden = true
 		}
+	}
+
+	function sendRequest(method, path, tokenId, paramId, id) {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+				document.getElementById(id).innerHTML = JSON.stringify(JSON.parse(xhr.response), null, "\t");
+            }
+        }
+		var tokenEle = document.getElementById(tokenId);
+		var token = '';
+		if(tokenEle != null) {
+			token = tokenEle.value;
+		}
+		var paramEle = document.getElementById(paramId);
+		var paramValue = ''
+		if(paramEle != null) {
+			paramValue = paramEle.value;
+		}
+		var body;
+		if(paramValue != '') {
+			if(method == 'get' || method == 'delete') {
+				path += '?'+paramValue;
+			}else{
+				body = paramValue;
+			}
+		}
+        xhr.open(method, path, true);
+        xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+		xhr.setRequestHeader('Authorization', 'Bearer '+ token);
+        xhr.send(body);
+    }
+	function formatParams( params ){
+		return "?" + Object
+			.keys(params)
+			.map(function(key){
+				return key+"="+encodeURIComponent(params[key])
+			})
+			.join("&")
 	}
 
 	showGotoIndex()

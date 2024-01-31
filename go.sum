@@ -4,8 +4,8 @@ github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ3
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/donnol/do v0.87.0 h1:QC+s+dLhKHCO9uHvES3E7db4FyGTeajLHoQzvZkDnK8=
-github.com/donnol/do v0.87.0/go.mod h1:/drBgwpmSlqq0ZiA+HQHcRWZnXMFUPYX/u0upWAYcss=
+github.com/donnol/do v1.0.0 h1:yqy6vQ6ahkPuHYoRYBiq+z/DwsWbfsqF4SENXBtHCDM=
+github.com/donnol/do v1.0.0/go.mod h1:/drBgwpmSlqq0ZiA+HQHcRWZnXMFUPYX/u0upWAYcss=
 github.com/gin-contrib/sse v0.1.0 h1:Y/yl/+YNO8GZSjAhjMsSuLt29uWRFHdHYUb5lYOV9qE=
 github.com/gin-contrib/sse v0.1.0/go.mod h1:RHrZQHXnP2xjPF+u1gW/2HnVO7nvIa9PG3Gm+fLHvGI=
 github.com/gin-gonic/gin v1.8.2 h1:UzKToD9/PoFj/V4rvlKqTRKnQYyz8Sc1MJlv4JHPtvY=
