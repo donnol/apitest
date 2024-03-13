@@ -74,6 +74,52 @@ func TestStructToBlock(t *testing.T) {
 			t.Fatalf("compare value failed: %s != %s", lv, v)
 		}
 	}
+
+	// struct slice
+	{
+		line, lkcm, err := structToBlock(paramName, http.MethodGet, &[]testtype.TestModel{
+			{
+				Name: "abc",
+				List: []testtype.User{
+					{
+						Id:   1,
+						Name: "dd",
+						Age:  10,
+					},
+				},
+			},
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+		want := `Param - Query
+
+* (*object list*) 数据列表
+    * name (*string*) 名称
+    * list (*object list*) 用户列表
+        * id (*string*) id
+        * name (*string*) 名字
+        * age (*int*) 年龄
+        * addr (*object*) 地址
+            * city (*string*) 城市
+            * home (*string*) 家
+        * phone (*string*) 手机
+
+`
+		if line != want {
+			t.Errorf("bad line: %s != %s", line, want)
+		}
+
+		for k, v := range kcm {
+			lv, ok := lkcm[k]
+			if !ok {
+				t.Fatalf("cant find %s in local kcm", k)
+			}
+			if lv != v {
+				t.Fatalf("compare value failed: %s != %s", lv, v)
+			}
+		}
+	}
 }
 
 func Test_dataToSummary(t *testing.T) {

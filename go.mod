@@ -12,7 +12,7 @@ require (
 require github.com/golang-jwt/jwt/v5 v5.2.0 // indirect
 
 require (
-	github.com/donnol/do v1.0.0
+	github.com/donnol/do v1.5.0
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect

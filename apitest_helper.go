@@ -736,10 +736,29 @@ func structToList(name string, data ...any) (string, error) {
 
 func structToBlock(name, method string, data any) (string, map[string]string, error) {
 	var block string
+	var err error
+	var isSlice bool
 
-	dataStruct, err := do.ResolveStruct(data)
-	if err != nil {
-		return block, nil, err
+	refv := reflect.ValueOf(data)
+	if refv.Type().Kind() == reflect.Pointer {
+		refv = refv.Elem()
+	}
+	var dataStruct do.Struct
+	if refv.Type().Kind() == reflect.Slice {
+		isSlice = true
+
+		datastructs, err := do.ResolveStructSlice(data)
+		if err != nil {
+			return block, nil, err
+		}
+		if len(datastructs) > 0 {
+			dataStruct = datastructs[0]
+		}
+	} else {
+		dataStruct, err = do.ResolveStruct(data)
+		if err != nil {
+			return block, nil, err
+		}
 	}
 
 	block += name
@@ -754,9 +773,18 @@ func structToBlock(name, method string, data any) (string, map[string]string, er
 		}
 	}
 	block += "\n\n"
-	fields := dataStruct.GetFields()
+
 	var level int
+	if isSlice {
+		level++
+	}
+
+	fields := dataStruct.GetFields()
 	lines, kcm := fieldsToLine(level, fields)
+	if isSlice {
+		lines = "* (*object list*) 数据列表\n" + lines
+	}
+
 	block += lines + "\n"
 
 	return block, kcm, nil
