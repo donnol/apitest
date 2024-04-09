@@ -301,13 +301,9 @@ func (at *AT) PressureRun(n, c int) *AT {
 	w.Stop()
 
 	// 记录结束时间，并计算耗时
-	after := time.Now()
-	used := after.Unix() - before.Unix()
-	var avg int64
-	if used != 0 {
-		avg = total / used
-	}
-	fmt.Printf("\n=== Pressure Report ===\nNumber: %d\nConcurrency: %d\nCompleted: %d\nUsed time: %ds\nRPS: %v\n=== END ===\n\n", n, c, total, used, avg)
+	used := time.Since(before)
+	avg := float64(total) / float64(used.Milliseconds()) * 1000
+	fmt.Printf("\n=== Pressure Report ===\nNumber: %d\nConcurrency: %d\nCompleted: %d\nUsed time: %vs\nRPS: %v\n=== END ===\n\n", n, c, total, do.Round(used.Seconds(), 2), do.Round(avg, 2))
 
 	return at
 }
