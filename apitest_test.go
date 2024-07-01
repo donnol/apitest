@@ -5,7 +5,9 @@ import (
 	"net/http"
 	"os"
 	"reflect"
+	"strings"
 	"testing"
+	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/donnol/apitest/testtype"
@@ -213,5 +215,28 @@ func TestWriteFile(t *testing.T) {
 			}
 			catalogEntries = append(catalogEntries, at.CatalogEntry())
 		})
+	}
+}
+
+func TestClientTimeout(t *testing.T) {
+	port := ":8800"
+	timeout := 1 * time.Second
+
+	go func() {
+		http.ListenAndServe(port, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			time.Sleep(timeout + time.Second)
+		}))
+	}()
+
+	// without timeout
+	if err := NewAT("/", http.MethodGet, "timeout test", nil, nil).SetPort(port).Run().Err(); err != nil {
+		t.Error(err)
+	}
+
+	// with timeout
+	if err := NewAT("/", http.MethodGet, "timeout test", nil, nil).SetPort(port).SetClientTimeout(timeout).Run().Err(); err != nil {
+		if !strings.Contains(err.Error(), "context deadline exceeded (Client.Timeout exceeded while awaiting headers)") {
+			t.Error(err)
+		}
 	}
 }

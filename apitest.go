@@ -60,6 +60,7 @@ type AT struct {
 	path            string
 	method          string
 	comment         string
+	clientTimeout   time.Duration
 	header          http.Header
 	cookies         []*http.Cookie
 	param           any
@@ -130,6 +131,12 @@ func (at *AT) New() *AT {
 // SetScheme 设置scheme
 func (at *AT) SetScheme(scheme string) *AT {
 	at.scheme = scheme
+	return at
+}
+
+// SetClientTimeout set client timeout like: 10*time.Second
+func (at *AT) SetClientTimeout(timeout time.Duration) *AT {
+	at.clientTimeout = timeout
 	return at
 }
 
@@ -582,27 +589,29 @@ func (at *AT) run(realDo bool) *AT {
 	switch at.method {
 	case http.MethodGet, http.MethodDelete:
 		q := u.Query()
-		params, err := structToMap(at.param)
-		if err != nil {
-			at.setErr(err)
-			return at
-		}
-		var valueStr string
-		for key, value := range params {
-			switch v := value.(type) { // 类型断言，既不能用逗号分隔，也不可用fallthrough
-			case []int: // 整型数组
-				for _, s := range v {
-					valueStr = fmt.Sprintf("%v", s)
+		if at.param != nil {
+			params, err := structToMap(at.param)
+			if err != nil {
+				at.setErr(err)
+				return at
+			}
+			var valueStr string
+			for key, value := range params {
+				switch v := value.(type) { // 类型断言，既不能用逗号分隔，也不可用fallthrough
+				case []int: // 整型数组
+					for _, s := range v {
+						valueStr = fmt.Sprintf("%v", s)
+						q.Add(key, valueStr)
+					}
+				case []string: // 字符串数组
+					for _, s := range v {
+						valueStr = fmt.Sprintf("%v", s)
+						q.Add(key, valueStr)
+					}
+				default:
+					valueStr = fmt.Sprintf("%v", value)
 					q.Add(key, valueStr)
 				}
-			case []string: // 字符串数组
-				for _, s := range v {
-					valueStr = fmt.Sprintf("%v", s)
-					q.Add(key, valueStr)
-				}
-			default:
-				valueStr = fmt.Sprintf("%v", value)
-				q.Add(key, valueStr)
 			}
 		}
 		u.RawQuery = q.Encode()
@@ -747,8 +756,12 @@ func (at *AT) run(realDo bool) *AT {
 		MaxIdleConnsPerHost: 100, // 每个域名最大空闲连接数
 		TLSClientConfig:     tlsConfig,
 	}
+	var clientTimeout = 10 * time.Second
+	if at.clientTimeout != 0 {
+		clientTimeout = at.clientTimeout
+	}
 	client := &http.Client{
-		Timeout:   time.Second * 10, // 超时
+		Timeout:   clientTimeout, // 超时
 		Transport: transport,
 	}
 	if realDo {
