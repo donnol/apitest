@@ -31,12 +31,18 @@ type Option struct {
 
 	paramIndex  int // 参数位置
 	resultIndex int // 结果位置
+
+	withBasePath bool // 请求路径是否需要basePath前缀
+
+	resultWrapper func(v any) any
 }
 
 func (o *Option) Default() {
 	o.basePath = "/api"
 	o.paramIndex = 1
 	o.resultIndex = 0
+	o.withBasePath = true
+	o.resultWrapper = func(v any) any { return Result[any]{Data: v} }
 }
 
 type Setter func(*Option)
@@ -62,6 +68,18 @@ func WithParamIndex(paramIndex int) Setter {
 func WithResultIndex(resultIndex int) Setter {
 	return func(o *Option) {
 		o.resultIndex = resultIndex
+	}
+}
+
+func UseBasePath(withBasePath bool) Setter {
+	return func(o *Option) {
+		o.withBasePath = withBasePath
+	}
+}
+
+func WithResultWrapper(resultWrapper func(v any) any) Setter {
+	return func(o *Option) {
+		o.resultWrapper = resultWrapper
 	}
 }
 
@@ -125,7 +143,10 @@ func NewCollector(
 		}
 		// fullPath肯定是唯一的，但route.Path则不是：
 		//  route.Path是/page的情况下，fullPath可能是/user/page，也可能是/book/page
-		fullPath := basePath + route.Path
+		fullPath := route.Path
+		if opt.withBasePath {
+			fullPath = basePath + route.Path
+		}
 		key := apiKey2(route.Method, fullPath)
 		pathKeys = append(pathKeys, key)
 		at := NewAT(fullPath, route.Method, route.Comment, nil, nil)
@@ -139,10 +160,11 @@ func NewCollector(
 			at.UseXMLResultFormat()
 		}
 		m[key] = &TestAPI{
-			AT:     at,
-			key:    key,
-			param:  param,
-			result: result,
+			AT:            at,
+			key:           key,
+			param:         param,
+			result:        result,
+			resultWrapper: opt.resultWrapper,
 		}
 	}
 
@@ -180,6 +202,8 @@ type TestAPI struct {
 
 	key           string
 	param, result reflect.Type
+
+	resultWrapper func(v any) any
 }
 
 // getParamResult 获取key所对应的参数和结果
@@ -187,14 +211,18 @@ func (t *TestAPI) GetParamResult(gen ...func(key string, param, result reflect.T
 	if len(gen) > 0 && gen[0] != nil {
 		return gen[0](t.key, t.param, t.result)
 	}
-	return GenParamResult(t.key, t.param, t.result)
+	return GenParamResult(t.key, t.param, t.result, t.resultWrapper)
 }
 
-func GenParamResult(key string, param, result reflect.Type) (p, r any) {
+func GenParamResult(key string, param, result reflect.Type, resultWrapper ...func(v any) any) (p, r any) {
 	// 默认使用随机值
 	p = fillStruct(key, param)
 	rv := fillStruct(key, result)
-	r = Result[any]{Data: rv}
+	if len(resultWrapper) > 0 {
+		r = resultWrapper[0](rv)
+	} else {
+		r = Result[any]{Data: rv}
+	}
 
 	return
 }
