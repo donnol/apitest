@@ -28,12 +28,15 @@ type Collector struct {
 type Option struct {
 	basePath string
 	group    *gin.RouterGroup
+
+	paramIndex  int // 参数位置
+	resultIndex int // 结果位置
 }
 
 func (o *Option) Default() {
-	if o.basePath == "" {
-		o.basePath = "/api"
-	}
+	o.basePath = "/api"
+	o.paramIndex = 1
+	o.resultIndex = 0
 }
 
 type Setter func(*Option)
@@ -50,6 +53,18 @@ func WithRouterGroup(group *gin.RouterGroup) Setter {
 	}
 }
 
+func WithParamIndex(paramIndex int) Setter {
+	return func(o *Option) {
+		o.paramIndex = paramIndex
+	}
+}
+
+func WithResultIndex(resultIndex int) Setter {
+	return func(o *Option) {
+		o.resultIndex = resultIndex
+	}
+}
+
 // NewCollector while obj is an interface and routem is a map contains apikey and handler function
 func NewCollector(
 	obj interface {
@@ -59,10 +74,10 @@ func NewCollector(
 	opts ...Setter,
 ) *Collector {
 	opt := &Option{}
+	opt.Default()
 	for _, set := range opts {
 		set(opt)
 	}
-	opt.Default()
 
 	collector := &Collector{
 		opt: opt,
@@ -102,8 +117,8 @@ func NewCollector(
 		if tval, ok := routem[routeKey]; ok {
 			val, count := tval.Unpack()
 			_ = count
-			ptyp := val.Type().In(1)
-			rtyp := val.Type().Out(0)
+			ptyp := val.Type().In(opt.paramIndex)
+			rtyp := val.Type().Out(opt.resultIndex)
 
 			param = ptyp
 			result = rtyp
