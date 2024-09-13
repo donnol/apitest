@@ -27,6 +27,7 @@ type Collector struct {
 
 type Option struct {
 	basePath string
+	group    *gin.RouterGroup
 }
 
 func (o *Option) Default() {
@@ -40,6 +41,12 @@ type Setter func(*Option)
 func WithBasePath(basePath string) Setter {
 	return func(o *Option) {
 		o.basePath = basePath
+	}
+}
+
+func WithRouterGroup(group *gin.RouterGroup) Setter {
+	return func(o *Option) {
+		o.group = group
 	}
 }
 
@@ -65,9 +72,14 @@ func NewCollector(
 	//
 	// use `findTestAPIsByPrefix` to get api batch by prefix
 	// test engine
-	gin.SetMode(gin.ReleaseMode)
-	engine := gin.Default()
-	apiGroup := engine.Group(opt.basePath)
+	var apiGroup *gin.RouterGroup
+	if opt.group == nil {
+		gin.SetMode(gin.ReleaseMode)
+		engine := gin.Default()
+		apiGroup = engine.Group(opt.basePath)
+	} else {
+		apiGroup = opt.group
+	}
 
 	// test api
 	routes := obj.RegisterAPI(apiGroup)
