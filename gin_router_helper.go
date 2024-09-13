@@ -19,17 +19,47 @@ const (
 )
 
 type Collector struct {
+	opt *Option
+
 	testAPIs    map[string]*TestAPI
 	testAPIKeys []string
 }
 
+type Option struct {
+	basePath string
+}
+
+func (o *Option) Default() {
+	if o.basePath == "" {
+		o.basePath = "/api"
+	}
+}
+
+type Setter func(*Option)
+
+func WithBasePath(basePath string) Setter {
+	return func(o *Option) {
+		o.basePath = basePath
+	}
+}
+
+// NewCollector while obj is an interface and routem is a map contains apikey and handler function
 func NewCollector(
 	obj interface {
 		RegisterAPI(apiGroup *gin.RouterGroup) []*Route
 	},
 	routem map[string]lo.Tuple2[reflect.Value, int],
+	opts ...Setter,
 ) *Collector {
-	collector := &Collector{}
+	opt := &Option{}
+	for _, set := range opts {
+		set(opt)
+	}
+	opt.Default()
+
+	collector := &Collector{
+		opt: opt,
+	}
 
 	// key is apiKey2(method, fullpath)
 	//
@@ -37,14 +67,10 @@ func NewCollector(
 	// test engine
 	gin.SetMode(gin.ReleaseMode)
 	engine := gin.Default()
-	apiGroup := engine.Group("/api")
+	apiGroup := engine.Group(opt.basePath)
 
 	// test api
-	if routem == nil {
-		routem = make(map[string]lo.Tuple2[reflect.Value, int])
-	}
 	routes := obj.RegisterAPI(apiGroup)
-	// fmt.Printf("routem: %+v\n", routem)
 
 	// generate apitest object
 	pathKeys := make([]string, 0, 64)
@@ -62,7 +88,6 @@ func NewCollector(
 		var param, result reflect.Type
 		routeKey := apiKey2(route.Method, route.Path, v)
 		if tval, ok := routem[routeKey]; ok {
-			// fmt.Printf("route key with param: %s\n", routeKey)
 			val, count := tval.Unpack()
 			_ = count
 			ptyp := val.Type().In(1)
