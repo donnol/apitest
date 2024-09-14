@@ -122,7 +122,7 @@ func NewCollector(
 	m := make(map[string]*TestAPI)
 	pathm := make(map[string]int)
 	setAPI := func(basePath string, route *Route) {
-		pathkey := apiKey2(route.Method, route.Path)
+		pathkey := ApiKey(route.Method, route.Path)
 		v, ok := pathm[pathkey]
 		if ok {
 			pathm[pathkey] = v + 1
@@ -131,7 +131,7 @@ func NewCollector(
 		}
 
 		var param, result reflect.Type
-		routeKey := apiKey2(route.Method, route.Path, v)
+		routeKey := ApiKey(route.Method, route.Path, v)
 		if tval, ok := routem[routeKey]; ok {
 			val, count := tval.Unpack()
 			_ = count
@@ -147,7 +147,7 @@ func NewCollector(
 		if opt.withBasePath {
 			fullPath = basePath + route.Path
 		}
-		key := apiKey2(route.Method, fullPath)
+		key := ApiKey(route.Method, fullPath)
 		pathKeys = append(pathKeys, key)
 		at := NewAT(fullPath, route.Method, route.Comment, nil, nil)
 		if route.Opt.NeedLogin {
@@ -239,7 +239,7 @@ func (c *Collector) FindTestAPIsByPrefix(prefix string) (r []*TestAPI) {
 	for _, key := range c.testAPIKeys {
 		item := c.testAPIs[key]
 
-		key := apiKey2(item.Method(), item.Path())
+		key := ApiKey(item.Method(), item.Path())
 		if !strings.HasPrefix(key, prefix) {
 			continue
 		}
@@ -275,7 +275,7 @@ type Result[T any] struct {
 	Data T `json:"data"` // 业务数据
 }
 
-func apiKey2(method, path string, i ...int) string {
+func ApiKey(method, path string, i ...int) string {
 	if len(i) == 0 || i[0] == 0 {
 		return path + " " + method
 	}
