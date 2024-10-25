@@ -26,6 +26,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"path/filepath"
 	"reflect"
 	"strings"
 	"sync/atomic"
@@ -1040,4 +1041,51 @@ func (at *AT) registerHandler(name string, handler any) *AT {
 	at.handlerMap[name] = handler
 
 	return at
+}
+
+type (
+	DocHelper interface {
+		Fatal(args ...any)
+		FindTestAPIsByPrefix(prefix string) (r []*TestAPI)
+		GetParamResult(key string, param reflect.Type, result reflect.Type) (p any, r any)
+	}
+)
+
+func MakeDoc(t DocHelper, dir, file, title, pathPrefix string) {
+	pf, err := OpenFile(filepath.Join(dir, file), title)
+	if err != nil {
+		t.Fatal(err)
+	}
+	f := new(bytes.Buffer)
+	catalogs := []CatalogEntry{}
+	defer func() {
+		catalog, err := MakeCatalog(catalogs)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if _, err := pf.Write([]byte(catalog)); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := pf.Write(f.Bytes()); err != nil {
+			t.Fatal(err)
+		}
+		pf.Close()
+	}()
+
+	// doc
+	for _, item := range t.FindTestAPIsByPrefix(pathPrefix) {
+		{
+			at := item
+			p, r := at.GetParamResult(t.GetParamResult)
+			if err = at.SetParam(p).
+				FakeRun().
+				Result(r).
+				Errors().
+				WriteFile(f).
+				Err(); err != nil {
+				t.Fatal(err)
+			}
+			catalogs = append(catalogs, at.CatalogEntry())
+		}
+	}
 }
