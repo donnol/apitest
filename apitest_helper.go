@@ -21,6 +21,7 @@ import (
 
 	"github.com/donnol/do"
 	"github.com/go-xmlfmt/xmlfmt"
+	"github.com/jaswdr/faker"
 )
 
 func init() {
@@ -772,7 +773,15 @@ func structToBlock(name, method string, data any) (string, map[string]string, er
 			block += "Body"
 		}
 	}
-	block += "\n\n"
+	id := name + "-" + faker.New().UUID().V4()
+	tmpl := do.Must1(template.New("copyJSON").Parse(copyJSONTmpl))
+	buf := new(bytes.Buffer)
+	do.Must(tmpl.Execute(buf, copyJSON{
+		ButtonId: "button-" + id,
+		TextId:   id,
+		Text:     string(do.Must1(json.Marshal(data))),
+	}))
+	block += buf.String() + "\n\n"
 
 	var level int
 	if isSlice {
@@ -788,6 +797,16 @@ func structToBlock(name, method string, data any) (string, map[string]string, er
 	block += lines + "\n"
 
 	return block, kcm, nil
+}
+
+var (
+	copyJSONTmpl = `&nbsp;<button id="{{.ButtonId}}" onclick="(function() {var copyText = document.getElementById('{{.TextId}}');copyText.select();copyText.setSelectionRange(0, 99999);navigator.clipboard.writeText(copyText.value);var btn = document.getElementById('{{.ButtonId}}');btn.innerHTML='Copied!';btn.style.backgroundColor='powderblue';setTimeout(()=>{btn.innerHTML='Copy JSON';btn.style.backgroundColor='buttonface';}, 5000);})()">Copy JSON</button><textarea id="{{.TextId}}" style="display:none;">{{.Text}}</textarea>`
+)
+
+type copyJSON struct {
+	ButtonId string
+	TextId   string
+	Text     string
 }
 
 var (
